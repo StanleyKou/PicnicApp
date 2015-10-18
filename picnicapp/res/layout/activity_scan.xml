@@ -77,7 +77,6 @@
             android:id="@+id/btnSetting"
             android:layout_width="200dp"
             android:layout_height="34.67dp"
-            android:layout_below="@id/tvTitle"
             android:layout_marginLeft="14dp"
             android:layout_toRightOf="@id/tvScanCount"
             android:drawableEnd="@drawable/setting"
@@ -106,18 +105,7 @@
                 android:layout_height="match_parent"
                 android:listSelector="@drawable/listitem_selector"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/tvBeaconScanNodata"
-                android:layout_width="250dp"
-                android:layout_height="100dp"
-                android:layout_centerInParent="true"
-                android:background="@color/list_no_item_background"
-                android:gravity="center"
-                android:text="스캔 된 데이터가 없습니다"
-                android:textColor="@color/list_no_item_text" />
+                android:paddingRight="10dp" />
         </RelativeLayout>
     </RelativeLayout>
 
