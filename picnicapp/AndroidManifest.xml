@@ -4,9 +4,8 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    
-    <!-- http://www.andykhan.com/jexcelapi/index.html  LGPL-->
-    
+    <!-- http://www.andykhan.com/jexcelapi/index.html  LGPL -->
+
     <uses-sdk
         android:minSdkVersion="18"
         android:targetSdkVersion="18" />
@@ -37,10 +36,6 @@
             android:name=".SettingActivity"
             android:screenOrientation="portrait"
             android:theme="@android:style/Theme.Holo.Light.NoActionBar" />
-
-        <service
-            android:name=".BluetoothLeService"
-            android:enabled="true" />
     </application>
 
 </manifest>
