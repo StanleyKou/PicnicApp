@@ -1,25 +1,8 @@
-/*
- * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.kou.picnicapp;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
@@ -28,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,117 +24,95 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.kou.picnicapp.base.BaseActivity;
 import com.kou.picnicapp.model.TargetData;
 import com.kou.picnicapp.utils.LogWrapper;
 
-public class DeviceScanActivity extends BaseActivity implements OnClickListener {
-
-	private static final String TAG = DeviceScanActivity.class.getSimpleName();
-
-	private BluetoothAdapter bluetoothAdapter;
-	private boolean isScanning;
-	private Handler handler = new Handler();
-
+public class ScanFragment extends Fragment implements OnClickListener {
+	private static final String TAG = ScanFragment.class.getSimpleName();
+	private static final String ARG_POSITION = "position";
 	private static final int REQUEST_ENABLE_BT = 1;
-	// Stops scanning after 60 seconds.
 	private static final long SCAN_PERIOD = 60000;
 
+	private int position;
+	private View mainView;
+
+	private BluetoothAdapter bluetoothAdapter;
 	private ListView lvDevice;
 	private TargetListAdapter listAdapter;
 
-	private Button btnScanStart;
-	private Button btnScanStop;
-	private Button btnSetting;
+	private Button btnScan;
+	private boolean isScanning;
+	private Handler handler = new Handler();
+
+	public static ScanFragment newInstance(int position) {
+		ScanFragment f = new ScanFragment();
+		Bundle b = new Bundle();
+		b.putInt(ARG_POSITION, position);
+		f.setArguments(b);
+		return f;
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_scan);
 
-		// Use this check to determine whether BLE is supported on the device. Then you can
-		// selectively disable BLE-related features.
-		if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
-			finish();
+		position = getArguments().getInt(ARG_POSITION);
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+		mainView = inflater.inflate(R.layout.fragment_scan, null);
+
+		Context context = getActivity();
+
+		if (context != null) {
+			if (!getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+				Toast.makeText(getActivity(), R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
+			}
+
+			final BluetoothManager bluetoothManager = (BluetoothManager) getActivity().getSystemService(Context.BLUETOOTH_SERVICE);
+			bluetoothAdapter = bluetoothManager.getAdapter();
+
+			if (bluetoothAdapter == null) {
+				Toast.makeText(getActivity(), R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
+			}
 		}
 
-		// Initializes a Bluetooth adapter. For API level 18 and above, get a reference to
-		// BluetoothAdapter through BluetoothManager.
-		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
-		bluetoothAdapter = bluetoothManager.getAdapter();
-
-		// Checks if Bluetooth is supported on the device.
-		if (bluetoothAdapter == null) {
-			Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
-			finish();
-			return;
-		}
-
-		lvDevice = (ListView) findViewById(R.id.lvDevice);
+		lvDevice = (ListView) mainView.findViewById(R.id.lvDevice);
 		lvDevice.setDivider(null);
 
 		listAdapter = new TargetListAdapter();
 		lvDevice.setAdapter(listAdapter);
 		lvDevice.setOnItemClickListener(onItemClickListener);
 
-		btnScanStart = (Button) findViewById(R.id.btnScanStart);
-		btnScanStop = (Button) findViewById(R.id.btnScanStop);
-		btnSetting = (Button) findViewById(R.id.btnSetting);
+		btnScan = (Button) mainView.findViewById(R.id.btnScan);
+		btnScan.setOnClickListener(this);
 
-		btnScanStart.setOnClickListener(this);
-		btnScanStop.setOnClickListener(this);
-		btnSetting.setOnClickListener(this);
-
-	}
-
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// getMenuInflater().inflate(R.menu.main, menu);
-	// if (!mScanning) {
-	// menu.findItem(R.id.menu_stop).setVisible(false);
-	// menu.findItem(R.id.menu_scan).setVisible(true);
-	// menu.findItem(R.id.menu_refresh).setActionView(null);
-	// } else {
-	// menu.findItem(R.id.menu_stop).setVisible(true);
-	// menu.findItem(R.id.menu_scan).setVisible(false);
-	// menu.findItem(R.id.menu_refresh).setActionView(R.layout.actionbar_indeterminate_progress);
-	// }
-	// return true;
-	// }
-
-	// @Override
-	// public boolean onOptionsItemSelected(MenuItem item) {
-	// switch (item.getItemId()) {
-	// case R.id.menu_scan:
-	// performStartScan();
-	// break;
-	// case R.id.menu_stop:
-	// performStopScan();
-	// break;
-	// }
-	// return true;
-	// }
-
-	private void performStartScan() {
-		scanLeDevice(true);
-	}
-
-	private void performStopScan() {
-		scanLeDevice(false);
-	}
-
-	private void performSetting() {
-		Intent intent = new Intent(DeviceScanActivity.this, SettingActivity.class);
-		startActivity(intent);
+		return mainView;
+		// LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+		//
+		// FrameLayout fl = new FrameLayout(getActivity());
+		// fl.setLayoutParams(params);
+		//
+		// final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+		//
+		// TextView v = new TextView(getActivity());
+		// params.setMargins(margin, margin, margin, margin);
+		// v.setLayoutParams(params);
+		// v.setLayoutParams(params);
+		// v.setGravity(Gravity.CENTER);
+		// v.setBackgroundResource(R.drawable.background_card);
+		// v.setText("CARD " + (position + 1));
+		//
+		// fl.addView(v);
+		// return fl;
 	}
 
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
 
-		// Ensures Bluetooth is enabled on the device. If Bluetooth is not currently enabled,
-		// fire an intent to display a dialog asking the user to grant permission to enable it.
 		if (!bluetoothAdapter.isEnabled()) {
 			if (!bluetoothAdapter.isEnabled()) {
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -164,21 +126,30 @@ public class DeviceScanActivity extends BaseActivity implements OnClickListener 
 
 	}
 
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// User chose not to enable Bluetooth.
-		if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
-			finish();
-			return;
-		}
-		super.onActivityResult(requestCode, resultCode, data);
+	private void performStartScan() {
+		scanLeDevice(true);
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
+	private void performStopScan() {
 		scanLeDevice(false);
+	}
 
+	private void scanLeDevice(final boolean enable) {
+		if (enable) {
+			handler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					isScanning = false;
+					bluetoothAdapter.stopLeScan(mLeScanCallback);
+				}
+			}, SCAN_PERIOD);
+
+			isScanning = true;
+			bluetoothAdapter.startLeScan(mLeScanCallback);
+		} else {
+			isScanning = false;
+			bluetoothAdapter.stopLeScan(mLeScanCallback);
+		}
 	}
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
@@ -199,45 +170,6 @@ public class DeviceScanActivity extends BaseActivity implements OnClickListener 
 		}
 	};
 
-	@Override
-	public void onClick(View v) {
-
-		switch (v.getId()) {
-		case R.id.btnScanStart:
-			performStartScan();
-			break;
-
-		case R.id.btnScanStop:
-			performStopScan();
-			break;
-
-		case R.id.btnSetting:
-			performSetting();
-			break;
-		}
-	}
-
-	private void scanLeDevice(final boolean enable) {
-		if (enable) {
-			// Stops scanning after a pre-defined scan period.
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					isScanning = false;
-					bluetoothAdapter.stopLeScan(mLeScanCallback);
-					// invalidateOptionsMenu();
-				}
-			}, SCAN_PERIOD);
-
-			isScanning = true;
-			bluetoothAdapter.startLeScan(mLeScanCallback);
-		} else {
-			isScanning = false;
-			bluetoothAdapter.stopLeScan(mLeScanCallback);
-		}
-		invalidateOptionsMenu();
-	}
-
 	// Adapter for holding devices found through scanning.
 	private class TargetListAdapter extends BaseAdapter {
 		private ArrayList<TargetData> targetlist = new ArrayList<TargetData>();
@@ -245,7 +177,7 @@ public class DeviceScanActivity extends BaseActivity implements OnClickListener 
 
 		public TargetListAdapter() {
 			super();
-			inflator = DeviceScanActivity.this.getLayoutInflater();
+			inflator = getActivity().getLayoutInflater();
 		}
 
 		public void checkTarget(BluetoothDevice device) {
@@ -342,7 +274,7 @@ public class DeviceScanActivity extends BaseActivity implements OnClickListener 
 
 			LogWrapper.d(TAG, "mac: " + device.getAddress() + " rssi: " + rssi + " filt:" + filteredRssi);
 
-			runOnUiThread(new Runnable() {
+			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
 					listAdapter.checkTarget(device);
@@ -458,44 +390,13 @@ public class DeviceScanActivity extends BaseActivity implements OnClickListener 
 
 	}
 
-	// <!-- http://www.andykhan.com/jexcelapi/index.html LGPL-->
-	// Workbook workbook = null;
-	// Sheet sheet = null;
-	//
-	// try {
-	// InputStream is = getBaseContext().getResources().getAssets().open("notes.xlsx");
-	// workbook = Workbook.getWorkbook(is);
-	//
-	// if (workbook != null) {
-	// sheet = workbook.getSheet(0);
-	//
-	// if (sheet != null) {
-	//
-	// int nMaxColumn = 2;
-	// int nRowStartIndex = 0;
-	// int nRowEndIndex = sheet.getColumn(nMaxColumn - 1).length - 1;
-	// int nColumnStartIndex = 0;
-	// int nColumnEndIndex = sheet.getRow(2).length - 1;
-	//
-	// dbAdapter.open();
-	// for (int nRow = nRowStartIndex; nRow <= nRowEndIndex; nRow++) {
-	// String title = sheet.getCell(nColumnStartIndex, nRow).getContents();
-	// String body = sheet.getCell(nColumnStartIndex + 1, nRow).getContents();
-	// dbAdapter.createNote(title, body);
-	// }
-	// dbAdapter.close();
-	// } else {
-	// System.out.println("Sheet is null!!");
-	// }
-	// } else {
-	// System.out.println("WorkBook is null!!");
-	// }
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// } finally {
-	// if (workbook != null) {
-	// workbook.close();
-	// }
-	// }
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btnScan:
+			performStartScan();
+			break;
 
+		}
+	}
 }

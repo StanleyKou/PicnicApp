@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">picnicapp</string>
+    <string name="app_name">PicnicApp</string>
     <string name="hello_world">Hello world!</string>
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="label_data">Data:</string>
@@ -15,7 +15,8 @@
     <string name="unknown_device">Unknown device</string>
     <string name="unknown_characteristic">Unknown characteristic</string>
     <string name="unknown_service">Unknown service</string>
-
+    <string name="action_contact">Contact</string>
+    
     <!-- Menu items -->
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>

@@ -10,12 +10,13 @@
     <color name="btn_background_color_click">#FF7F7F</color>
     <color name="btn_text_color">#FFFFFF</color>
     <color name="scan_text">#FFFFFF</color>
-    <color name="scan_summary_text">#FFFFFF</color>
+    <color name="scan_summary_text">#020202</color>
     <color name="scan_summary_background">#201534</color>
-    <color name="listitem_clicked">#2015C9</color>
+    <color name="listitem_clicked">#4045C9</color>
     <color name="list_no_item_text">#F0F0F0</color>
     <color name="list_no_item_background">#8C8C8C</color>
     <color name="gray">#B5B9B6</color>
     <color name="light_gray">#F5F9F6</color>
+    <color name="background_window">#FFE5E5E5</color>
 
 </resources>
