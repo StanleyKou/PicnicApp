@@ -12,8 +12,8 @@ import android.content.SharedPreferences;
 public class PreferenceUtils {
 
 	private static final String PREF_KEY = "pref";
+	private static final String PREF_KEY_IsShortcutInstalled = "PREF_KEY_IsShortcutInstalled";
 
-	@SuppressWarnings("unused")
 	private static void saveBooleanPreference(Context context, String key, boolean defValue) {
 		SharedPreferences pref = context.getSharedPreferences(PREF_KEY, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = pref.edit();
@@ -21,7 +21,6 @@ public class PreferenceUtils {
 		editor.commit();
 	}
 
-	@SuppressWarnings("unused")
 	private static boolean loadBooleanPreference(Context context, String key, boolean defValue) {
 		SharedPreferences pref = context.getSharedPreferences(PREF_KEY, Activity.MODE_PRIVATE);
 		return pref.getBoolean(key, defValue);
@@ -57,14 +56,14 @@ public class PreferenceUtils {
 	}
 
 	// ///////////////////////// get /////////////////////////
-	// public static boolean getIsShortcutInstalled(Context applicationContext) {
-	// return loadBooleanPreference(applicationContext, PREF_KEY_IsShortcutInstalled, false);
-	// }
+	public static boolean getIsShortcutInstalled(Context applicationContext) {
+		return loadBooleanPreference(applicationContext, PREF_KEY_IsShortcutInstalled, false);
+	}
 
 	// ///////////////////////// set /////////////////////////
 
-	// public static void setIsShortcutInstalled(Context applicationContext, boolean value) {
-	// saveBooleanPreference(applicationContext, PREF_KEY_IsShortcutInstalled, value);
-	// }
+	public static void setIsShortcutInstalled(Context applicationContext, boolean value) {
+		saveBooleanPreference(applicationContext, PREF_KEY_IsShortcutInstalled, value);
+	}
 
 }

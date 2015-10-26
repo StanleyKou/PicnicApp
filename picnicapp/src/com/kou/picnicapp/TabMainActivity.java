@@ -20,7 +20,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.LayerDrawable;
@@ -36,7 +35,6 @@ import android.support.v4.view.ViewPager;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
 import com.astuetz.PagerSlidingTabStrip;
@@ -246,8 +244,19 @@ public class TabMainActivity extends FragmentActivity {
 
 		@Override
 		public Fragment getItem(int position) {
-			// return SuperAwesomeCardFragment.newInstance(position);
-			return ScanFragment.newInstance(position);
+
+			switch (position) {
+
+			case 0:
+				return ScanFragment.newInstance(position);
+			case 1:
+				return ScanFragment.newInstance(position);
+			case 2:
+				return SettingsFragment.newInstance(position);
+			default:
+				return ScanFragment.newInstance(position);
+			}
+
 		}
 
 	}
