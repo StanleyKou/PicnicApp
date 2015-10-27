@@ -1,5 +1,10 @@
 package com.kou.picnicapp;
 
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+
+import jxl.write.WriteException;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.ObjectAnimator;
@@ -9,12 +14,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.kou.picnicapp.base.BaseActivity;
+import com.kou.picnicapp.excel.WriteSampleExcel;
 import com.kou.picnicapp.utils.LogWrapper;
 import com.kou.picnicapp.utils.Utils;
 
@@ -25,6 +32,10 @@ public class SplashActivity extends BaseActivity {
 	private RelativeLayout rlSplash;
 	private RelativeLayout rlLogin;
 	private RelativeLayout rlVersionCode;
+
+	private File mPath = null;
+	private static final String FTYPE = ".xls";
+	private String[] mFileList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -48,10 +59,51 @@ public class SplashActivity extends BaseActivity {
 			finish();
 		}
 
-		mHandler.postDelayed(mSplashRunnable, SPLASH_TIME);
+		mPath = new File(Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name));
+		loadFileList();
 
+		if (mFileList.length == 0) {
+			createSampleExcelFile();
+		}
 		Utils.installShortcut(this);
 		Utils.createDirIfNotExists(this);
+
+		mHandler.postDelayed(mSplashRunnable, SPLASH_TIME);
+
+	}
+
+	private void createSampleExcelFile() {
+		WriteSampleExcel sampleExcel = new WriteSampleExcel();
+		sampleExcel.setOutputFile(mPath + "/sample.xls");
+		try {
+			sampleExcel.write();
+		} catch (WriteException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void loadFileList() {
+		try {
+			mPath.mkdirs();
+		} catch (SecurityException e) {
+			LogWrapper.e(TAG, "unable to write on the sd card " + e.toString());
+		}
+		if (mPath.exists()) {
+			FilenameFilter filter = new FilenameFilter() {
+
+				@Override
+				public boolean accept(File dir, String filename) {
+					File sel = new File(dir, filename);
+					return filename.contains(FTYPE) || sel.isDirectory();
+				}
+
+			};
+			mFileList = mPath.list(filter);
+		} else {
+			mFileList = new String[0];
+		}
 	}
 
 	private Handler mHandler = new Handler();
@@ -79,7 +131,6 @@ public class SplashActivity extends BaseActivity {
 				@Override
 				public void onAnimationEnd(Animator animation) {
 					rlSplash.setVisibility(View.GONE);
-
 					Intent i = new Intent(SplashActivity.this, TabMainActivity.class);
 					startActivity(i);
 					finish();
@@ -98,35 +149,6 @@ public class SplashActivity extends BaseActivity {
 			// ObjectAnimator loginUpAnim = ObjectAnimator.ofFloat(rlLogin, "translationY", -200).setDuration(1000);
 			// loginUpAnim.setStartDelay(800);
 			// loginUpAnim.start();
-
-			ObjectAnimator loginAlphaAnim = ObjectAnimator.ofFloat(rlLogin, "alpha", 0, 1).setDuration(1000);
-			loginAlphaAnim.setStartDelay(1500);
-			loginAlphaAnim.addListener(new AnimatorListener() {
-
-				@Override
-				public void onAnimationStart(Animator animation) {
-					// rlLogin.setVisibility(View.VISIBLE);
-				}
-
-				@Override
-				public void onAnimationRepeat(Animator animation) {
-				}
-
-				@Override
-				public void onAnimationEnd(Animator animation) {
-
-				}
-
-				@Override
-				public void onAnimationCancel(Animator animation) {
-				}
-			});
-			loginAlphaAnim.start();
-
-			// ObjectAnimator loginMoveToLeftAnim = ObjectAnimator.ofFloat(rlLogin, "translationX", 400, 0).setDuration(1200);
-			// loginMoveToLeftAnim.setStartDelay(1500);
-			// loginMoveToLeftAnim.setInterpolator(new BounceInterpolator());
-			// loginMoveToLeftAnim.start();
 
 		}
 	};
