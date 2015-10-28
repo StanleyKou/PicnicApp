@@ -6,16 +6,16 @@ public class TargetData {
 		UNKNOWN, FOUND
 	};
 
-	public int sequence_id;
-	public String number;
-	public String name;
-	public long lastCheckedTime = 0;
-	public CHECK_STATE checkState = CHECK_STATE.UNKNOWN;
-	public String phoneNumber;
-	public String uuid;
-	public int major;
-	public int minor;
-	public String rssi;
+	private int sequence_id; // not used
+	private String number;
+	private String name;
+	private long lastCheckedTime = 0;
+	private CHECK_STATE checkState = CHECK_STATE.UNKNOWN;
+	private String phoneNumber;
+	private String uuid;
+	private int major;
+	private int minor;
+	private String rssi;
 
 	public int getSequence_id() {
 		return sequence_id;

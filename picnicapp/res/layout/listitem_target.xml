@@ -7,42 +7,91 @@
     <RelativeLayout
         android:id="@+id/rlRange"
         android:layout_width="48dp"
-        android:layout_height="match_parent" >
+        android:layout_height="36dp" >
 
         <View
             android:layout_width="24dp"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"
             android:background="#00FF00" />
+
+        <TextView
+            android:id="@+id/tvRange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="15m"
+            android:textSize="16dp" />
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+    <RelativeLayout
+        android:id="@+id/rlUserInfo"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/rlRange"
-        android:orientation="vertical" >
+        android:orientation="horizontal" >
 
         <TextView
             android:id="@+id/tvTargetNumber"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="6.67dp"
             android:text="1"
-            android:textSize="24dp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/tvTargetName"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="6.67dp"
+            android:layout_toRightOf="@id/tvTargetNumber"
             android:text="김일동"
-            android:textSize="24dp" />
+            android:textSize="16dp" />
 
         <TextView
             android:id="@+id/tvTargetPhone"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="6.67dp"
+            android:layout_toRightOf="@id/tvTargetName"
             android:text="010-1111-2222"
-            android:textSize="24dp" />
-    </LinearLayout>
+            android:textSize="16dp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/rlUserInfo"
+        android:layout_toRightOf="@id/rlRange"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tvUUID"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="6.67dp"
+            android:text="54b2e3bb-6b9b-4a08-9e54-73b3e7dca326"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/tvMajor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvUUID"
+            android:layout_marginLeft="6.67dp"
+            android:text="12345"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/tvMinor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/tvUUID"
+            android:layout_marginLeft="6.67dp"
+            android:layout_toRightOf="@id/tvMajor"
+            android:text="54321"
+            android:textSize="16dp" />
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/ivFound"

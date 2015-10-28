@@ -229,13 +229,15 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		@Override
 		public View getView(int i, View view, ViewGroup viewGroup) {
 			ViewHolder viewHolder;
-			// General ListView optimization code.
 			if (view == null) {
 				view = inflator.inflate(R.layout.listitem_target, null);
 				viewHolder = new ViewHolder();
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
+				viewHolder.tvUUID = (TextView) view.findViewById(R.id.tvUUID);
+				viewHolder.tvMajor = (TextView) view.findViewById(R.id.tvMajor);
+				viewHolder.tvMinor = (TextView) view.findViewById(R.id.tvMinor);
 				viewHolder.ivFound = (ImageView) view.findViewById(R.id.ivFound);
 				view.setTag(viewHolder);
 			} else {
@@ -244,9 +246,13 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 			TargetData target = targetDatalist.get(i);
 
-			viewHolder.tvTargetNumber.setText(target.number + "");
-			viewHolder.tvTargetName.setText(target.name);
-			viewHolder.tvTargetPhone.setText(target.phoneNumber);
+			viewHolder.tvTargetNumber.setText(target.getNumber() + "");
+			viewHolder.tvTargetName.setText(target.getName());
+			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
+
+			viewHolder.tvUUID.setText(target.getUuid());
+			viewHolder.tvMajor.setText(target.getMajor() + "");
+			viewHolder.tvMinor.setText(target.getMinor() + "");
 
 			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_unknown);
@@ -262,6 +268,10 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		TextView tvTargetNumber;
 		TextView tvTargetName;
 		TextView tvTargetPhone;
+		TextView tvUUID;
+		TextView tvMajor;
+		TextView tvMinor;
+
 		ImageView ivFound;
 	}
 

@@ -236,9 +236,9 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 
 			TargetData target = targetlist.get(i);
 
-			viewHolder.tvTargetNumber.setText(target.number + "");
-			viewHolder.tvTargetName.setText(target.name);
-			viewHolder.tvTargetPhone.setText(target.phoneNumber);
+			viewHolder.tvTargetNumber.setText(target.getNumber() + "");
+			viewHolder.tvTargetName.setText(target.getName());
+			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
 
 			// BluetoothDevice device = leTargetItems.get(i);
 			// final String deviceName = device.getName();
