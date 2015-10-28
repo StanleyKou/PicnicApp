@@ -248,13 +248,13 @@ public class TabMainActivity extends FragmentActivity {
 			switch (position) {
 
 			case 0:
-				return ScanFragment.newInstance(position);
+				return ScanCheckFragment.newInstance(position);
 			case 1:
-				return ScanFragment.newInstance(position);
+				return ScanGuardFragment.newInstance(position);
 			case 2:
 				return SettingsFragment.newInstance(position);
 			default:
-				return ScanFragment.newInstance(position);
+				return ScanCheckFragment.newInstance(position);
 			}
 
 		}

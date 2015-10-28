@@ -32,4 +32,7 @@
     <string name="check_list_failed">File error: incorrect data</string>
     <string name="guard_list_failed">File error: incorrect data</string>
 
+    <!-- List -->
+    <string name="no_list_data">No list data.\nPlease load list in settings tab.</string>
+
 </resources>

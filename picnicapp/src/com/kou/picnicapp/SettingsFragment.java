@@ -207,9 +207,11 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
 			}
 
-			if (targetDataList.size() == 0) {
+			if (targetDataList == null || targetDataList.size() == 0) {
 				Toast.makeText(getActivity(), getString(R.string.check_list_failed), Toast.LENGTH_SHORT).show();
 			} else {
 				Gson gson = new Gson();

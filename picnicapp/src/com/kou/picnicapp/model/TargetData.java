@@ -2,14 +2,20 @@ package com.kou.picnicapp.model;
 
 public class TargetData {
 
+	public static enum CHECK_STATE {
+		UNKNOWN, FOUND
+	};
+
 	public int sequence_id;
 	public String number;
 	public String name;
-	public long lastCheckedTime;
+	public long lastCheckedTime = 0;
+	public CHECK_STATE checkState = CHECK_STATE.UNKNOWN;
 	public String phoneNumber;
 	public String uuid;
-	public String major;
-	public String minor;
+	public int major;
+	public int minor;
+	public String rssi;
 
 	public int getSequence_id() {
 		return sequence_id;
@@ -43,6 +49,14 @@ public class TargetData {
 		this.lastCheckedTime = lastCheckedTime;
 	}
 
+	public CHECK_STATE getCheckState() {
+		return checkState;
+	}
+
+	public void setCheckState(CHECK_STATE checkState) {
+		this.checkState = checkState;
+	}
+
 	public String getPhoneNumber() {
 		return phoneNumber;
 	}
@@ -59,20 +73,28 @@ public class TargetData {
 		this.uuid = uuid;
 	}
 
-	public String getMajor() {
+	public int getMajor() {
 		return major;
 	}
 
-	public void setMajor(String major) {
+	public void setMajor(int major) {
 		this.major = major;
 	}
 
-	public String getMinor() {
+	public int getMinor() {
 		return minor;
 	}
 
-	public void setMinor(String minor) {
+	public void setMinor(int minor) {
 		this.minor = minor;
+	}
+
+	public String getRssi() {
+		return rssi;
+	}
+
+	public void setRssi(String rssi) {
+		this.rssi = rssi;
 	}
 
 }

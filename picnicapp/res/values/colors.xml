@@ -21,5 +21,6 @@
     <color name="list_no_item_text">#F0F0F0</color>
     <color name="list_no_item_background">#8C8C8C</color>
     <color name="background_window">#FFE5E5E5</color>
+    <color name="no_item_background">#8C8C8C</color>
 
 </resources>

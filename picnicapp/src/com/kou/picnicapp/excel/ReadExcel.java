@@ -13,7 +13,7 @@ import com.kou.picnicapp.model.TargetData;
 
 public class ReadExcel {
 
-	public static ArrayList<TargetData> read(String inputFile) throws IOException, WriteException {
+	public static ArrayList<TargetData> read(String inputFile) throws IOException, WriteException, NumberFormatException {
 
 		File inputWorkbook = new File(inputFile);
 		ArrayList<TargetData> targetDataList = new ArrayList<TargetData>();
@@ -28,8 +28,8 @@ public class ReadExcel {
 				t.setName(sheet.getCell(1, i).getContents());
 				t.setPhoneNumber(sheet.getCell(2, i).getContents());
 				t.setUuid(sheet.getCell(3, i).getContents());
-				t.setMajor(sheet.getCell(4, i).getContents());
-				t.setMinor(sheet.getCell(5, i).getContents());
+				t.setMajor(Integer.parseInt(sheet.getCell(4, i).getContents()));
+				t.setMinor(Integer.parseInt(sheet.getCell(5, i).getContents()));
 				targetDataList.add(t);
 			}
 

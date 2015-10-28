@@ -8,5 +8,6 @@
     <string name="guard_list_saved">지킴이 리스트를 선택하였습니다</string>
     <string name="check_list_failed">파일에러: 적절하지 않은 형식의 데이터</string>
     <string name="guard_list_failed">파일에러: 적절하지 않은 형식의 데이터</string>
+    <string name="no_list_data">목록 데이터가 없습니다.\n설정화면에서 목록을 선택 해 주세요.</string>
 
 </resources>
