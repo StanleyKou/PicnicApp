@@ -23,6 +23,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,15 +40,19 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	private static final String ARG_POSITION = "position";
 	private static final int REQUEST_ENABLE_BT = 1;
 	private static final long SCAN_PERIOD = 60000;
+	private static final int SCAN_COUNT_MAX = 61;
 
 	private int position;
 	private View mainView;
 
 	private BluetoothAdapter bluetoothAdapter;
 	private TextView tvNodata;
+	private TextView tvScanCount;
 	private ListView lvDevice;
 	private TargetListAdapter listAdapter;
 
+	private int scanCount = 0;
+	private int checkCount = 0;
 	private Button btnScan;
 	private boolean isScanning;
 	private Handler handler = new Handler();
@@ -70,7 +75,7 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mainView = inflater.inflate(R.layout.fragment_scan, null);
+		mainView = inflater.inflate(R.layout.fragment_scan_check, null);
 
 		Context context = getActivity();
 
@@ -88,6 +93,7 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		}
 
 		tvNodata = (TextView) mainView.findViewById(R.id.tvNodata);
+		tvScanCount = (TextView) mainView.findViewById(R.id.tvScanCount);
 		lvDevice = (ListView) mainView.findViewById(R.id.lvDevice);
 		lvDevice.setDivider(null);
 
@@ -113,13 +119,14 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		}
 
 		setTargetData();
+		performStopScan();
 	}
 
 	private void performStartScan() {
 
-		// FIXME: Checked state를 모두 리셋 해야 함.
-		setTargetData();
-
+		scanCount = SCAN_COUNT_MAX;
+		handler.post(countDownScanRunnable);
+		clearCheckState();
 		scanLeDevice(true);
 	}
 
@@ -143,6 +150,36 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			isScanning = false;
 			bluetoothAdapter.stopLeScan(mLeScanCallback);
 		}
+	}
+
+	private Runnable countDownScanRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			scanCount--;
+
+			if (scanCount <= 0) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						btnScan.setText(getString(R.string.scan_text));
+					}
+				});
+			} else {
+				handler.postDelayed(countDownScanRunnable, 1000);
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						btnScan.setText(getString(R.string.scan_text) + " " + scanCount);
+					}
+				});
+			}
+		}
+	};
+
+	private void clearCheckState() {
+		tvScanCount.setText("0 / " + listAdapter.getCount());
+		listAdapter.clearCheckState();
 	}
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
@@ -173,11 +210,17 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			inflator = getActivity().getLayoutInflater();
 		}
 
+		public void clearCheckState() {
+			for (TargetData t : targetDatalist) {
+				t.setCheckState(CHECK_STATE.UNKNOWN);
+			}
+		}
+
 		public void checkTarget(BeaconBluetoothDevice beacon) {
 
 			for (TargetData t : targetDatalist) {
 				if (t.getCheckState() == CHECK_STATE.FOUND) {
-					break;
+					// Do nothing
 				} else {
 
 					if (t.getUuid().equals(beacon.getUUID())//
@@ -185,18 +228,11 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 							&& t.getMinor() == beacon.getMinor()) {
 
 						t.setCheckState(CHECK_STATE.FOUND);
-
+						checkCount++;
+						tvScanCount.setText(checkCount + " / " + listAdapter.getCount());
 					}
-
 				}
 			}
-
-			// targetDataList
-
-			// if (!leTargetItems.contains(device)) {
-			// // leDevices.add(device);
-			//
-			// }
 		}
 
 		public void setTargetData(ArrayList<TargetData> targetDatalist) {
@@ -232,10 +268,13 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			if (view == null) {
 				view = inflator.inflate(R.layout.listitem_target, null);
 				viewHolder = new ViewHolder();
+
+				viewHolder.rlListItem = (RelativeLayout) view.findViewById(R.id.rlListItem);
+				viewHolder.rlRange = (RelativeLayout) view.findViewById(R.id.rlRange);
+
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
-				viewHolder.tvUUID = (TextView) view.findViewById(R.id.tvUUID);
 				viewHolder.tvMajor = (TextView) view.findViewById(R.id.tvMajor);
 				viewHolder.tvMinor = (TextView) view.findViewById(R.id.tvMinor);
 				viewHolder.ivFound = (ImageView) view.findViewById(R.id.ivFound);
@@ -250,14 +289,17 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			viewHolder.tvTargetName.setText(target.getName());
 			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
 
-			viewHolder.tvUUID.setText(target.getUuid());
-			viewHolder.tvMajor.setText(target.getMajor() + "");
-			viewHolder.tvMinor.setText(target.getMinor() + "");
+			viewHolder.tvMajor.setText("Major: " + target.getMajor());
+			viewHolder.tvMinor.setText("Minor: " + target.getMinor());
 
 			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
+				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_unknown);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_unknown);
+				viewHolder.rlRange.setVisibility(View.GONE);
 			} else {
+				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_found);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_found);
+				viewHolder.rlRange.setVisibility(View.VISIBLE);
 			}
 
 			return view;
@@ -265,6 +307,9 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	}
 
 	static class ViewHolder {
+		RelativeLayout rlListItem;
+		RelativeLayout rlRange;
+
 		TextView tvTargetNumber;
 		TextView tvTargetName;
 		TextView tvTargetPhone;
@@ -311,12 +356,15 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		if (strData == null || strData.length() == 0) {
 			tvNodata.setVisibility(View.VISIBLE);
 			lvDevice.setVisibility(View.GONE);
+			tvScanCount.setText("0 / 0");
 		} else {
 			Gson gson = new Gson();
 			java.lang.reflect.Type listType = new TypeToken<List<TargetData>>() {
 			}.getType();
 			ArrayList<TargetData> targetDataList = gson.fromJson(strData, listType);
 			listAdapter.setTargetData(targetDataList);
+			tvScanCount.setText("0 / " + listAdapter.getCount());
+
 		}
 	}
 

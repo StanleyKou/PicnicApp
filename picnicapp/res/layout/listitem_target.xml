@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rlListItem"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@drawable/listitem_unknown"
     android:orientation="horizontal" >
 
     <RelativeLayout
@@ -37,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="6.67dp"
             android:text="1"
-            android:textSize="16dp" />
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/tvTargetName"
@@ -46,7 +48,7 @@
             android:layout_marginLeft="6.67dp"
             android:layout_toRightOf="@id/tvTargetNumber"
             android:text="김일동"
-            android:textSize="16dp" />
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/tvTargetPhone"
@@ -66,30 +68,20 @@
         android:orientation="horizontal" >
 
         <TextView
-            android:id="@+id/tvUUID"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="6.67dp"
-            android:text="54b2e3bb-6b9b-4a08-9e54-73b3e7dca326"
-            android:textSize="12dp" />
-
-        <TextView
             android:id="@+id/tvMajor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvUUID"
             android:layout_marginLeft="6.67dp"
-            android:text="12345"
+            android:text="Major: 12345"
             android:textSize="16dp" />
 
         <TextView
             android:id="@+id/tvMinor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/tvUUID"
             android:layout_marginLeft="6.67dp"
             android:layout_toRightOf="@id/tvMajor"
-            android:text="54321"
+            android:text="Minor: 54321"
             android:textSize="16dp" />
     </RelativeLayout>
 

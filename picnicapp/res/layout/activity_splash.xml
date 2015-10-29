@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="@color/splash_background" >
 
     <RelativeLayout
         android:id="@+id/rlSplash"
@@ -12,19 +13,10 @@
 
         <ImageView
             android:id="@+id/ivSplash_icon"
-            android:layout_width="300dp"
-            android:layout_height="300dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_launcher" />
-
-        <ImageView
-            android:id="@+id/ivSplashTitle"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_below="@id/ivSplash_icon"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="34dp"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/splash_center" />
     </RelativeLayout>
 
     <RelativeLayout

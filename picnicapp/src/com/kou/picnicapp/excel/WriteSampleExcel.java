@@ -70,7 +70,7 @@ public class WriteSampleExcel {
 	}
 
 	private void createContent(WritableSheet sheet) throws WriteException, RowsExceededException {
-		for (int i = 1; i < 10; i++) {
+		for (int i = 1; i < 4; i++) {
 			addLabel(sheet, 0, i, i + "");
 			addLabel(sheet, 1, i, "이름" + i);
 			addLabel(sheet, 2, i, "010-1234-000" + i);

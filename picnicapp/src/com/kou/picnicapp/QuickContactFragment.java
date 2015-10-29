@@ -70,8 +70,7 @@ public class QuickContactFragment extends DialogFragment {
 				fullWidth = display.getWidth();
 			}
 
-			final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources()
-					.getDisplayMetrics());
+			final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 24, getResources().getDisplayMetrics());
 
 			int w = fullWidth - padding;
 			int h = getDialog().getWindow().getAttributes().height;
@@ -82,8 +81,11 @@ public class QuickContactFragment extends DialogFragment {
 
 	public class ContactPagerAdapter extends PagerAdapter implements IconTabProvider {
 
-		private final int[] ICONS = { R.drawable.ic_launcher_gplus, R.drawable.ic_launcher_gmail,
-				R.drawable.ic_launcher_gmaps, R.drawable.ic_launcher_chrome };
+		private final int[] ICONS = { //
+		R.drawable.ywko,//
+				R.drawable.hikim,//
+				R.drawable.mjlee //
+		};
 
 		public ContactPagerAdapter() {
 			super();
@@ -104,9 +106,23 @@ public class QuickContactFragment extends DialogFragment {
 			// looks a little bit messy here
 			TextView v = new TextView(getActivity());
 			v.setBackgroundResource(R.color.background_window);
-			v.setText("PAGE " + (position + 1));
-			final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources()
-					.getDisplayMetrics());
+
+			String contactsText = "";
+
+			switch (position) {
+			case 0:
+				contactsText = getString(R.string.contacts_1);
+				break;
+			case 1:
+				contactsText = getString(R.string.contacts_2);
+				break;
+			case 2:
+				contactsText = getString(R.string.contacts_3);
+				break;
+			}
+
+			v.setText(contactsText);
+			final int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, getResources().getDisplayMetrics());
 			v.setPadding(padding, padding, padding, padding);
 			v.setGravity(Gravity.CENTER);
 			container.addView(v, 0);

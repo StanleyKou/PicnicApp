@@ -34,5 +34,13 @@
 
     <!-- List -->
     <string name="no_list_data">No list data.\nPlease load list in settings tab.</string>
+    <string name="scan_text">Scan</string>
+    
+
+    <!-- Contacts -->
+    <string name="contacts_creadits">Credits</string>
+    <string name="contacts_1">Yongwun Ko influenz@daum.net 010-5515-5014</string>
+    <string name="contacts_2">Hyein Kim hyein8989@gmail.com</string>
+    <string name="contacts_3">Minji Lee Manja0408@naver.com</string>
 
 </resources>

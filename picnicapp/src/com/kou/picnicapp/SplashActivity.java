@@ -111,13 +111,16 @@ public class SplashActivity extends BaseActivity {
 		@Override
 		public void run() {
 
-			ObjectAnimator splashUpAnim = ObjectAnimator.ofFloat(rlSplash, "translationY", -320).setDuration(1000);
-			splashUpAnim.setStartDelay(1000);
-			splashUpAnim.start();
+			// ObjectAnimator splashUpAnim = ObjectAnimator.ofFloat(rlSplash, "translationY", -320).setDuration(1000);
+			// splashUpAnim.setStartDelay(1000);
+			// splashUpAnim.start();
 
-			ObjectAnimator splashAnim = ObjectAnimator.ofFloat(rlSplash, "alpha", 1, 0).setDuration(1000);
-			splashAnim.setStartDelay(1500);
-			splashAnim.addListener(new AnimatorListener() {
+			ObjectAnimator splashAnim1 = ObjectAnimator.ofFloat(rlVersionCode, "alpha", 1, 0).setDuration(500);
+			splashAnim1.setStartDelay(500);
+
+			ObjectAnimator splashAnim2 = ObjectAnimator.ofFloat(rlSplash, "alpha", 1, 0).setDuration(500);
+			splashAnim2.setStartDelay(500);
+			splashAnim2.addListener(new AnimatorListener() {
 
 				@Override
 				public void onAnimationStart(Animator animation) {
@@ -140,7 +143,9 @@ public class SplashActivity extends BaseActivity {
 				public void onAnimationCancel(Animator animation) {
 				}
 			});
-			splashAnim.start();
+
+			splashAnim1.start();
+			splashAnim2.start();
 
 			// ObjectAnimator loginPositionAnim = ObjectAnimator.ofFloat(rlLogin, "translationY", 200).setDuration(0);
 			// loginPositionAnim.setStartDelay(0);

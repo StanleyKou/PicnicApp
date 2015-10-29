@@ -63,7 +63,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		mainView = inflater.inflate(R.layout.fragment_scan, null);
+		mainView = inflater.inflate(R.layout.fragment_scan_guard, null);
 
 		Context context = getActivity();
 

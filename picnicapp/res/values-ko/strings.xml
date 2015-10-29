@@ -10,4 +10,13 @@
     <string name="guard_list_failed">파일에러: 적절하지 않은 형식의 데이터</string>
     <string name="no_list_data">목록 데이터가 없습니다.\n설정화면에서 목록을 선택 해 주세요.</string>
 
+    <!-- Scan -->
+    <string name="scan_text">스캔</string>
+    
+    <!-- Contacts -->
+    <string name="contacts_creadits">만든사람들</string>
+    <string name="contacts_1">고용운 influenz@daum.net 010-5515-5014</string>
+    <string name="contacts_2">김혜인 hyein8989@gmail.com</string>
+    <string name="contacts_3">이민지 Manja0408@naver.com</string>
+
 </resources>
