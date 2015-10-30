@@ -43,8 +43,6 @@ import com.kou.picnicapp.model.TargetData.CHECK_STATE;
 import com.kou.picnicapp.utils.LogWrapper;
 import com.kou.picnicapp.utils.PreferenceUtils;
 
-// FIXME: background scan needed
-
 public class ScanGuardFragment extends Fragment implements OnClickListener {
 	private static final String TAG = ScanGuardFragment.class.getSimpleName();
 	private static final String ARG_POSITION = "position";
@@ -135,7 +133,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			}
 		}
 
-		// setTargetData();
+		setTargetData();
 		// performStopScan();
 	}
 
@@ -415,7 +413,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 	};
 
 	private void setTargetData() {
-		String strData = PreferenceUtils.getCheckList(getActivity());
+		String strData = PreferenceUtils.getGuardList(getActivity());
 
 		if (strData == null || strData.length() == 0) {
 			tvNodata.setVisibility(View.VISIBLE);

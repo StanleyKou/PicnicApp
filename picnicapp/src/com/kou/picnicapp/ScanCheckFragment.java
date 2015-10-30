@@ -142,10 +142,19 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		scanCount = SCAN_COUNT_MAX + 1;
 		handler.post(countDownScanRunnable);
 		clearCheckState();
+
 		scanLeDevice(true);
 	}
 
 	private void performStopScan() {
+		handler.removeCallbacks(countDownScanRunnable);
+		getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				btnScan.setText(getString(R.string.scan_text));
+			}
+		});
+
 		scanLeDevice(false);
 	}
 
@@ -434,7 +443,13 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btnScan:
-			performStartScan();
+
+			if (isScanning) {
+				performStopScan();
+			} else {
+				performStartScan();
+			}
+
 			break;
 
 		case R.id.btnSort:

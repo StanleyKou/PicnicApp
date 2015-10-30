@@ -17,6 +17,11 @@
     <string name="unknown_service">Unknown service</string>
     <string name="action_contact">Contact</string>
 
+    <!-- Tabs -->
+    <string name="tab_check">Check</string>
+    <string name="tab_guard">Guard</string>
+    <string name="tab_setting">Setting</string>
+
     <!-- Menu items -->
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>
@@ -34,6 +39,7 @@
 
     <!-- List -->
     <string name="no_list_data">No list data.\nPlease load list in settings tab.</string>
+    <string name="no_guard_data">No guard data.\nPlease load list in settings tab.\nIf you set data, app will automatically starts scan,\nSo it consumes more battery.</string>
     <string name="scan_text">Scan</string>
     <string name="send_call">Make a phone call</string>
     <string name="sort_notfound_first">Notfound first</string>

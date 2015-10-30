@@ -27,10 +27,11 @@ import com.kou.picnicapp.utils.Utils;
 
 public class SplashActivity extends BaseActivity {
 	private final String TAG = SplashActivity.class.getSimpleName();
-	private final int SPLASH_TIME = 800;
+	private final int SPLASH_TIME = 600;
+	private final int HIDE_DURATION = 500;
+	private final int HIDE_START_DELAY = 600;
 
 	private RelativeLayout rlSplash;
-	private RelativeLayout rlLogin;
 	private RelativeLayout rlVersionCode;
 
 	private File mPath = null;
@@ -115,11 +116,11 @@ public class SplashActivity extends BaseActivity {
 			// splashUpAnim.setStartDelay(1000);
 			// splashUpAnim.start();
 
-			ObjectAnimator splashAnim1 = ObjectAnimator.ofFloat(rlVersionCode, "alpha", 1, 0).setDuration(500);
-			splashAnim1.setStartDelay(500);
+			ObjectAnimator splashAnim1 = ObjectAnimator.ofFloat(rlVersionCode, "alpha", 1, 0).setDuration(HIDE_DURATION);
+			splashAnim1.setStartDelay(HIDE_START_DELAY);
 
-			ObjectAnimator splashAnim2 = ObjectAnimator.ofFloat(rlSplash, "alpha", 1, 0).setDuration(500);
-			splashAnim2.setStartDelay(500);
+			ObjectAnimator splashAnim2 = ObjectAnimator.ofFloat(rlSplash, "alpha", 1, 0).setDuration(HIDE_DURATION);
+			splashAnim2.setStartDelay(HIDE_START_DELAY);
 			splashAnim2.addListener(new AnimatorListener() {
 
 				@Override

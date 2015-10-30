@@ -94,7 +94,7 @@
                 android:layout_centerInParent="true"
                 android:background="@color/no_item_background"
                 android:gravity="center"
-                android:text="@string/no_list_data"
+                android:text="@string/no_guard_data"
                 android:textColor="@color/list_no_item_text"
                 android:visibility="gone" />
         </RelativeLayout>
