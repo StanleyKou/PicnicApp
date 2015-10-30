@@ -40,7 +40,7 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	private static final String ARG_POSITION = "position";
 	private static final int REQUEST_ENABLE_BT = 1;
 	private static final long SCAN_PERIOD = 60000;
-	private static final int SCAN_COUNT_MAX = 61;
+	private static final int SCAN_COUNT_MAX = (int) (SCAN_PERIOD / 1000);
 
 	private int position;
 	private View mainView;
@@ -124,7 +124,7 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 	private void performStartScan() {
 
-		scanCount = SCAN_COUNT_MAX;
+		scanCount = SCAN_COUNT_MAX + 1;
 		handler.post(countDownScanRunnable);
 		clearCheckState();
 		scanLeDevice(true);

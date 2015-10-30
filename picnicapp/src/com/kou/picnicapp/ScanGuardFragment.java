@@ -121,9 +121,9 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			}
 		}
 
-		scanLeDevice(true);
+		// scanLeDevice(true);
 
-		setData();
+		// setData();
 
 		// setDummyData();
 
