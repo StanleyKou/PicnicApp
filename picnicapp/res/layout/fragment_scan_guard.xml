@@ -2,33 +2,48 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/background" >
+    android:background="@color/scan_background" >
 
     <RelativeLayout
         android:id="@+id/rlScan_Menu_1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="43.33dp" >
 
         <TextView
             android:id="@+id/tvScanCountLabel"
             android:layout_width="wrap_content"
             android:layout_height="34.67dp"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
             android:gravity="center_vertical"
             android:text="검색결과:"
             android:textColor="@color/scan_summary_text"
-            android:textSize="20dp" />
+            android:textSize="14dp" />
 
         <TextView
             android:id="@+id/tvScanCount"
             android:layout_width="wrap_content"
             android:layout_height="34.67dp"
+            android:layout_centerVertical="true"
             android:layout_marginLeft="6.67dp"
             android:layout_toRightOf="@id/tvScanCountLabel"
             android:gravity="center_vertical"
             android:text="27 / 30"
             android:textColor="@color/scan_summary_text"
-            android:textSize="20dp" />
+            android:textSize="14dp" />
+
+        <Button
+            android:id="@+id/btnSort"
+            android:layout_width="74dp"
+            android:layout_height="34.67dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="13.33dp"
+            android:layout_toRightOf="@id/tvScanCount"
+            android:background="@drawable/btn_sort_notselected"
+            android:fontFamily="sans-serif"
+            android:text="@string/sort_notfound_first"
+            android:textColor="@color/scan_text"
+            android:textSize="11dp" />
 
         <Button
             android:id="@+id/btnScan"
@@ -37,11 +52,11 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="16.67dp"
-            android:background="@color/listitem_clicked"
+            android:background="@drawable/btn_scan"
             android:fontFamily="sans-serif"
-            android:text="스캔"
+            android:text="@string/scan_text"
             android:textColor="@color/scan_text"
-            android:textSize="9dp" />
+            android:textSize="11dp" />
     </RelativeLayout>
 
     <View
@@ -55,14 +70,14 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/view_divider_scan"
-        android:background="@color/background_light"
-        android:paddingTop="10dp" >
+        android:layout_marginTop="13.33dp"
+        android:background="@color/background_light" >
 
         <RelativeLayout
             android:id="@+id/rlMain"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginTop="3.33dp" >
+            android:background="@color/scan_background" >
 
             <ListView
                 android:id="@+id/lvDevice"

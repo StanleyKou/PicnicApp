@@ -1,14 +1,22 @@
 package com.kou.picnicapp;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.AlertDialog.Builder;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,30 +26,48 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.kou.picnicapp.model.BeaconBluetoothDevice;
 import com.kou.picnicapp.model.TargetData;
+import com.kou.picnicapp.model.TargetData.CHECK_STATE;
 import com.kou.picnicapp.utils.LogWrapper;
 import com.kou.picnicapp.utils.PreferenceUtils;
+
+// FIXME: background scan needed
 
 public class ScanGuardFragment extends Fragment implements OnClickListener {
 	private static final String TAG = ScanGuardFragment.class.getSimpleName();
 	private static final String ARG_POSITION = "position";
 	private static final int REQUEST_ENABLE_BT = 1;
-	private static final long SCAN_PERIOD = 60000;
+	// private static final long SCAN_PERIOD = 60000;
+	// private static final int SCAN_COUNT_MAX = (int) (SCAN_PERIOD / 1000);
 
 	private int position;
 	private View mainView;
 
 	private BluetoothAdapter bluetoothAdapter;
+	private TextView tvNodata;
+	private TextView tvScanCount;
 	private ListView lvDevice;
 	private TargetListAdapter listAdapter;
 
+	private int scanCount = 0;
+	private int checkCount = 0;
 	private Button btnScan;
+
+	private boolean isSortUse = false;
+	private Button btnSort;
+
 	private boolean isScanning;
 	private Handler handler = new Handler();
 
@@ -80,34 +106,22 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			}
 		}
 
+		tvNodata = (TextView) mainView.findViewById(R.id.tvNodata);
+		tvScanCount = (TextView) mainView.findViewById(R.id.tvScanCount);
 		lvDevice = (ListView) mainView.findViewById(R.id.lvDevice);
 		lvDevice.setDivider(null);
 
 		listAdapter = new TargetListAdapter();
 		lvDevice.setAdapter(listAdapter);
 		lvDevice.setOnItemClickListener(onItemClickListener);
+		lvDevice.setOnItemLongClickListener(onItemLongClickListener);
 
 		btnScan = (Button) mainView.findViewById(R.id.btnScan);
+		btnSort = (Button) mainView.findViewById(R.id.btnSort);
 		btnScan.setOnClickListener(this);
+		btnSort.setOnClickListener(this);
 
 		return mainView;
-		// LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-		//
-		// FrameLayout fl = new FrameLayout(getActivity());
-		// fl.setLayoutParams(params);
-		//
-		// final int margin = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
-		//
-		// TextView v = new TextView(getActivity());
-		// params.setMargins(margin, margin, margin, margin);
-		// v.setLayoutParams(params);
-		// v.setLayoutParams(params);
-		// v.setGravity(Gravity.CENTER);
-		// v.setBackgroundResource(R.drawable.background_card);
-		// v.setText("CARD " + (position + 1));
-		//
-		// fl.addView(v);
-		// return fl;
 	}
 
 	@Override
@@ -121,16 +135,16 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			}
 		}
 
-		// scanLeDevice(true);
-
-		// setData();
-
-		// setDummyData();
-
+		// setTargetData();
+		// performStopScan();
 	}
 
 	private void performStartScan() {
-		scanLeDevice(true);
+		// checkCount = 0;
+		// scanCount = SCAN_COUNT_MAX + 1;
+		// handler.post(countDownScanRunnable);
+		// clearCheckState();
+		// scanLeDevice(true);
 	}
 
 	private void performStopScan() {
@@ -138,44 +152,78 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 	}
 
 	private void scanLeDevice(final boolean enable) {
-		if (enable) {
-			handler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					isScanning = false;
-					bluetoothAdapter.stopLeScan(mLeScanCallback);
-				}
-			}, SCAN_PERIOD);
+		// if (enable) {
+		// handler.postDelayed(new Runnable() {
+		// @Override
+		// public void run() {
+		// isScanning = false;
+		// bluetoothAdapter.stopLeScan(mLeScanCallback);
+		// }
+		// }, SCAN_PERIOD);
+		//
+		// isScanning = true;
+		// bluetoothAdapter.startLeScan(mLeScanCallback);
+		// } else {
+		// isScanning = false;
+		// bluetoothAdapter.stopLeScan(mLeScanCallback);
+		// }
+	}
 
-			isScanning = true;
-			bluetoothAdapter.startLeScan(mLeScanCallback);
-		} else {
-			isScanning = false;
-			bluetoothAdapter.stopLeScan(mLeScanCallback);
+	private Runnable countDownScanRunnable = new Runnable() {
+
+		@Override
+		public void run() {
+			scanCount--;
+
+			if (scanCount <= 0) {
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						btnScan.setText(getString(R.string.scan_text));
+					}
+				});
+			} else {
+				handler.postDelayed(countDownScanRunnable, 1000);
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						btnScan.setText(getString(R.string.scan_text) + " " + scanCount);
+					}
+				});
+			}
 		}
+	};
+
+	private void clearCheckState() {
+		tvScanCount.setText("0 / " + listAdapter.getCount());
+		listAdapter.clearCheckState();
 	}
 
 	private OnItemClickListener onItemClickListener = new OnItemClickListener() {
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// final BluetoothDevice device = listAdapter.getDevice(position);
-			// if (device == null)
-			// return;
-			// final Intent intent = new Intent(this, DeviceControlActivity.class);
-			// intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-			// intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-			// // if (mScanning) {
-			// // mBluetoothAdapter.stopLeScan(mLeScanCallback);
-			// // mScanning = false;
-			// // }
-			// startActivity(intent);
+		}
+	};
+
+	private OnItemLongClickListener onItemLongClickListener = new OnItemLongClickListener() {
+
+		@Override
+		public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+			TargetData t = listAdapter.getItem(position);
+			String phoneNum = t.getPhoneNumber();
+
+			Dialog d = createPhoneDialog(phoneNum);
+			d.show();
+
+			return false;
 		}
 	};
 
 	// Adapter for holding devices found through scanning.
 	private class TargetListAdapter extends BaseAdapter {
-		private ArrayList<TargetData> targetlist = new ArrayList<TargetData>();
+		private ArrayList<TargetData> targetDatalist = new ArrayList<TargetData>();
 		private LayoutInflater inflator;
 
 		public TargetListAdapter() {
@@ -183,33 +231,56 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			inflator = getActivity().getLayoutInflater();
 		}
 
-		public void checkTarget(BluetoothDevice device) {
-			// if (!leTargetItems.contains(device)) {
-			// // leDevices.add(device);
-			//
-			// }
+		public void clearCheckState() {
+			for (TargetData t : targetDatalist) {
+				t.setCheckState(CHECK_STATE.UNKNOWN);
+			}
 		}
 
-		public void setTargetData(ArrayList<TargetData> targetlist) {
-			this.targetlist = targetlist;
+		public void checkTarget(BeaconBluetoothDevice beacon) {
+			for (TargetData t : targetDatalist) {
+				if (t.getCheckState() == CHECK_STATE.FOUND) {
+					// Do nothing
+				} else {
+
+					if (t.getUuid().equals(beacon.getUUID())//
+							&& t.getMajor() == beacon.getMajor()//
+							&& t.getMinor() == beacon.getMinor()) {
+
+						t.setCheckState(CHECK_STATE.FOUND);
+						checkCount++;
+						tvScanCount.setText(checkCount + " / " + listAdapter.getCount());
+					}
+				}
+			}
+
+			if (isSortUse) {
+				sortNotFoundFirst();
+			}
+
+			listAdapter.notifyDataSetChanged();
+		}
+
+		public void setTargetData(ArrayList<TargetData> targetDatalist) {
+			this.targetDatalist = targetDatalist;
 		}
 
 		public TargetData getDevice(int position) {
-			return targetlist.get(position);
+			return targetDatalist.get(position);
 		}
 
 		public void clear() {
-			targetlist.clear();
+			targetDatalist.clear();
 		}
 
 		@Override
 		public int getCount() {
-			return targetlist.size();
+			return targetDatalist.size();
 		}
 
 		@Override
-		public Object getItem(int i) {
-			return targetlist.get(i);
+		public TargetData getItem(int i) {
+			return targetDatalist.get(i);
 		}
 
 		@Override
@@ -217,45 +288,101 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			return i;
 		}
 
+		public void sortNumber() {
+			Collections.sort(targetDatalist, numComparator);
+		}
+
+		public void sortNotFoundFirst() {
+			Collections.sort(targetDatalist, numComparator);
+			Collections.sort(targetDatalist, foundComparator);
+		}
+
 		@Override
 		public View getView(int i, View view, ViewGroup viewGroup) {
 			ViewHolder viewHolder;
-			// General ListView optimization code.
 			if (view == null) {
 				view = inflator.inflate(R.layout.listitem_target, null);
 				viewHolder = new ViewHolder();
+
+				viewHolder.rlListItem = (RelativeLayout) view.findViewById(R.id.rlListItem);
+				viewHolder.rlRange = (RelativeLayout) view.findViewById(R.id.rlRange);
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
+				viewHolder.tvMajor = (TextView) view.findViewById(R.id.tvMajor);
+				viewHolder.tvMinor = (TextView) view.findViewById(R.id.tvMinor);
+				viewHolder.ivFound = (ImageView) view.findViewById(R.id.ivFound);
 				view.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) view.getTag();
 			}
 
-			// FIXME: Display
-
-			TargetData target = targetlist.get(i);
+			TargetData target = targetDatalist.get(i);
 
 			viewHolder.tvTargetNumber.setText(target.getNumber() + "");
 			viewHolder.tvTargetName.setText(target.getName());
 			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
 
-			// BluetoothDevice device = leTargetItems.get(i);
-			// final String deviceName = device.getName();
-			// if (deviceName != null && deviceName.length() > 0)
-			// viewHolder.deviceName.setText(deviceName);
-			// else
-			// viewHolder.deviceName.setText(R.string.unknown_device);
-			// viewHolder.deviceAddress.setText(device.getAddress());
+			viewHolder.tvMajor.setText("Major: " + target.getMajor());
+			viewHolder.tvMinor.setText("Minor: " + target.getMinor());
 
+			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
+				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_unknown);
+				viewHolder.ivFound.setImageResource(R.drawable.check_state_unknown);
+				viewHolder.rlRange.setVisibility(View.GONE);
+			} else {
+				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_found);
+				viewHolder.ivFound.setImageResource(R.drawable.check_state_found);
+				viewHolder.rlRange.setVisibility(View.VISIBLE);
+			}
 			return view;
 		}
 	}
 
+	Comparator<TargetData> numComparator = new Comparator<TargetData>() {
+
+		@Override
+		public int compare(TargetData lhs, TargetData rhs) {
+
+			int lhsNum = Integer.parseInt(lhs.getNumber());
+			int rhsNum = Integer.parseInt(rhs.getNumber());
+
+			return (lhsNum > rhsNum) ? 1 : (lhsNum < rhsNum) ? -1 : 0;
+		}
+	};
+
+	Comparator<TargetData> foundComparator = new Comparator<TargetData>() {
+
+		@Override
+		public int compare(TargetData lhs, TargetData rhs) {
+
+			int lhsNum = 0;
+			int rhsNum = 0;
+
+			if (lhs.getCheckState() == CHECK_STATE.FOUND) {
+				lhsNum = 1;
+			}
+
+			if (rhs.getCheckState() == CHECK_STATE.FOUND) {
+				rhsNum = 1;
+			}
+
+			return (lhsNum > rhsNum) ? 1 : (lhsNum < rhsNum) ? -1 : 0;
+		}
+	};
+
 	static class ViewHolder {
+		RelativeLayout rlListItem;
+		RelativeLayout rlRange;
+
 		TextView tvTargetNumber;
 		TextView tvTargetName;
 		TextView tvTargetPhone;
+		TextView tvUUID;
+		TextView tvMajor;
+		TextView tvMinor;
+
+		ImageView ivFound;
 	}
 
 	HashMap<String, KalmanFilter> filteredList = new HashMap<String, KalmanFilter>();
@@ -266,6 +393,8 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
 
+			final BeaconBluetoothDevice beacon = new BeaconBluetoothDevice(device, rssi, scanRecord);
+
 			KalmanFilter found = filteredList.get(device.getAddress());
 			int filteredRssi = rssi;
 			if (found == null) {
@@ -274,21 +403,33 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			} else {
 				filteredRssi = (int) found.update(rssi);
 			}
-
 			LogWrapper.d(TAG, "mac: " + device.getAddress() + " rssi: " + rssi + " filt:" + filteredRssi);
 
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					listAdapter.checkTarget(device);
-					listAdapter.notifyDataSetChanged();
+					listAdapter.checkTarget(beacon);
 				}
 			});
 		}
 	};
 
-	private void setData() {
-		PreferenceUtils.getGuardList(getActivity());
+	private void setTargetData() {
+		String strData = PreferenceUtils.getCheckList(getActivity());
+
+		if (strData == null || strData.length() == 0) {
+			tvNodata.setVisibility(View.VISIBLE);
+			lvDevice.setVisibility(View.GONE);
+			tvScanCount.setText("0 / 0");
+		} else {
+			Gson gson = new Gson();
+			java.lang.reflect.Type listType = new TypeToken<List<TargetData>>() {
+			}.getType();
+			ArrayList<TargetData> targetDataList = gson.fromJson(strData, listType);
+			listAdapter.setTargetData(targetDataList);
+			tvScanCount.setText("0 / " + listAdapter.getCount());
+
+		}
 	}
 
 	@Override
@@ -298,6 +439,48 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			performStartScan();
 			break;
 
+		case R.id.btnSort:
+			if (isSortUse == true) {
+				isSortUse = false;
+				btnSort.setBackgroundResource(R.drawable.btn_sort_notselected);
+				listAdapter.sortNumber();
+			} else {
+				isSortUse = true;
+				btnSort.setBackgroundResource(R.drawable.btn_sort);
+				listAdapter.sortNotFoundFirst();
+			}
+
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					listAdapter.notifyDataSetChanged();
+				}
+			});
+
+			break;
 		}
+	}
+
+	private String[] phoneNumberList;
+
+	protected Dialog createPhoneDialog(String number) {
+		Dialog dialog = null;
+
+		AlertDialog.Builder builder = new Builder(getActivity());
+		builder.setTitle(getString(R.string.send_call));
+		phoneNumberList = new String[] { number, };
+
+		builder.setItems(phoneNumberList, new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				String chosenPhoneNumber = phoneNumberList[which];
+				Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse("tel:" + chosenPhoneNumber));
+				startActivity(intent);
+
+			}
+		});
+
+		dialog = builder.create();
+		return dialog;
 	}
 }

@@ -201,17 +201,6 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			// final BluetoothDevice device = listAdapter.getDevice(position);
-			// if (device == null)
-			// return;
-			// final Intent intent = new Intent(this, DeviceControlActivity.class);
-			// intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_NAME, device.getName());
-			// intent.putExtra(DeviceControlActivity.EXTRAS_DEVICE_ADDRESS, device.getAddress());
-			// // if (mScanning) {
-			// // mBluetoothAdapter.stopLeScan(mLeScanCallback);
-			// // mScanning = false;
-			// // }
-			// startActivity(intent);
 		}
 	};
 
@@ -247,7 +236,6 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		}
 
 		public void checkTarget(BeaconBluetoothDevice beacon) {
-
 			for (TargetData t : targetDatalist) {
 				if (t.getCheckState() == CHECK_STATE.FOUND) {
 					// Do nothing
@@ -266,8 +254,6 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 			if (isSortUse) {
 				sortNotFoundFirst();
-			} else {
-				// sortNumber();
 			}
 
 			listAdapter.notifyDataSetChanged();
@@ -318,7 +304,6 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 				viewHolder.rlListItem = (RelativeLayout) view.findViewById(R.id.rlListItem);
 				viewHolder.rlRange = (RelativeLayout) view.findViewById(R.id.rlRange);
-
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
@@ -348,7 +333,6 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_found);
 				viewHolder.rlRange.setVisibility(View.VISIBLE);
 			}
-
 			return view;
 		}
 	}
@@ -497,5 +481,4 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		dialog = builder.create();
 		return dialog;
 	}
-
 }
