@@ -35,7 +35,8 @@
     <!-- List -->
     <string name="no_list_data">No list data.\nPlease load list in settings tab.</string>
     <string name="scan_text">Scan</string>
-    
+    <string name="send_call">Make a phone call</string>
+    <string name="sort_notfound_first">Notfound first</string>
 
     <!-- Contacts -->
     <string name="contacts_creadits">Credits</string>

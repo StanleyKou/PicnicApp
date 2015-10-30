@@ -12,7 +12,11 @@
 
     <!-- Scan -->
     <string name="scan_text">스캔</string>
-    
+
+    <!-- List -->
+    <string name="send_call">전화걸기</string>
+    <string name="sort_notfound_first">미발견우선</string>
+
     <!-- Contacts -->
     <string name="contacts_creadits">만든사람들</string>
     <string name="contacts_1">고용운 influenz@daum.net 010-5515-5014</string>
