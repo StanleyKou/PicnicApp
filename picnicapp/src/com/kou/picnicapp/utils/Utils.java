@@ -1,6 +1,7 @@
 package com.kou.picnicapp.utils;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 import android.app.Activity;
@@ -10,7 +11,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.Display;
 
 import com.kou.picnicapp.R;
@@ -120,4 +124,18 @@ public class Utils {
 		}
 	}
 
+	public static void playWarningSound(Context context) {
+		AssetFileDescriptor afd;
+		try {
+			MediaPlayer player = new MediaPlayer();
+			afd = context.getAssets().openFd("woopwoop2.mp3");
+			player.reset();
+			player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+			player.prepare();
+			player.start();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

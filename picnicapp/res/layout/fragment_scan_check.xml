@@ -56,7 +56,8 @@
             android:fontFamily="sans-serif"
             android:text="@string/scan_text"
             android:textColor="@color/scan_text"
-            android:textSize="11dp" />
+            android:textSize="11dp"
+            android:visibility="invisible" />
     </RelativeLayout>
 
     <View

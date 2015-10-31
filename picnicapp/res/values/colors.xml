@@ -22,7 +22,7 @@
     <color name="background_window">#FFE5E5E5</color>
 
     <!-- Splash -->
-    <color name="splash_background">#C8E6C9</color>
+    <color name="splash_background">#FFFDE7</color>
 
     <!-- Scan -->
     <color name="no_item_background">#707070</color>

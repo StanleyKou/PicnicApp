@@ -40,6 +40,7 @@ import com.google.gson.reflect.TypeToken;
 import com.kou.picnicapp.model.BeaconBluetoothDevice;
 import com.kou.picnicapp.model.TargetData;
 import com.kou.picnicapp.model.TargetData.CHECK_STATE;
+import com.kou.picnicapp.utils.KalmanFilter;
 import com.kou.picnicapp.utils.LogWrapper;
 import com.kou.picnicapp.utils.PreferenceUtils;
 
@@ -164,15 +165,15 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 				@Override
 				public void run() {
 					isScanning = false;
-					bluetoothAdapter.stopLeScan(mLeScanCallback);
+					bluetoothAdapter.stopLeScan(leScanCallback);
 				}
 			}, SCAN_PERIOD);
 
 			isScanning = true;
-			bluetoothAdapter.startLeScan(mLeScanCallback);
+			bluetoothAdapter.startLeScan(leScanCallback);
 		} else {
 			isScanning = false;
-			bluetoothAdapter.stopLeScan(mLeScanCallback);
+			bluetoothAdapter.stopLeScan(leScanCallback);
 		}
 	}
 
@@ -395,12 +396,10 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	HashMap<String, KalmanFilter> filteredList = new HashMap<String, KalmanFilter>();
 
 	// Device scan callback.
-	private BluetoothAdapter.LeScanCallback mLeScanCallback = new BluetoothAdapter.LeScanCallback() {
+	private BluetoothAdapter.LeScanCallback leScanCallback = new BluetoothAdapter.LeScanCallback() {
 
 		@Override
 		public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-
-			final BeaconBluetoothDevice beacon = new BeaconBluetoothDevice(device, rssi, scanRecord);
 
 			KalmanFilter found = filteredList.get(device.getAddress());
 			int filteredRssi = rssi;
@@ -412,6 +411,8 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			}
 			LogWrapper.d(TAG, "mac: " + device.getAddress() + " rssi: " + rssi + " filt:" + filteredRssi);
 
+			final BeaconBluetoothDevice beacon = new BeaconBluetoothDevice(device, filteredRssi, scanRecord);
+
 			getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
@@ -421,7 +422,7 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 		}
 	};
 
-	private void setTargetData() {
+	public void setTargetData() {
 		String strData = PreferenceUtils.getCheckList(getActivity());
 
 		if (strData == null || strData.length() == 0) {
@@ -429,6 +430,8 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			lvDevice.setVisibility(View.GONE);
 			tvScanCount.setText("0 / 0");
 		} else {
+			tvNodata.setVisibility(View.GONE);
+			lvDevice.setVisibility(View.VISIBLE);
 			Gson gson = new Gson();
 			java.lang.reflect.Type listType = new TypeToken<List<TargetData>>() {
 			}.getType();

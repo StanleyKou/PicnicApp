@@ -1,4 +1,4 @@
-package com.kou.picnicapp;
+package com.kou.picnicapp.utils;
 
 public class KalmanFilter {
 

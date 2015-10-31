@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-import jxl.write.WriteException;
 
 import com.kou.picnicapp.model.TargetData;
 
 public class ReadExcel {
 
-	public static ArrayList<TargetData> read(String inputFile) throws IOException, WriteException, NumberFormatException {
+	public static ArrayList<TargetData> read(String inputFile) {
 
 		File inputWorkbook = new File(inputFile);
 		ArrayList<TargetData> targetDataList = new ArrayList<TargetData>();
@@ -34,6 +33,10 @@ public class ReadExcel {
 			}
 
 		} catch (BiffException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (NumberFormatException e) {
 			e.printStackTrace();
 		}
 

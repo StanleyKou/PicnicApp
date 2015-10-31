@@ -1,0 +1,12 @@
+- 곧바로 스캔 되면 안됨. 백그라운드.
+
+- 연락처 4에 라이선스 표시
+
+http://soundbible.com/1559-Boxing-Arena-Sound.html
+
+Andreas Stuetz https://github.com/astuetz/PagerSlidingTabStrip
+
+
+- 지킴이 목록 불러왔는데 화면표시가 안됨
+
+- 스플래시 배경은 회색이나 리스트에서 찍자

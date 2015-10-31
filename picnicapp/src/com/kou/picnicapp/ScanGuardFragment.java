@@ -1,5 +1,9 @@
 package com.kou.picnicapp;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,19 +11,23 @@ import java.util.HashMap;
 import java.util.List;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.AlertDialog.Builder;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,8 +48,8 @@ import com.google.gson.reflect.TypeToken;
 import com.kou.picnicapp.model.BeaconBluetoothDevice;
 import com.kou.picnicapp.model.TargetData;
 import com.kou.picnicapp.model.TargetData.CHECK_STATE;
+import com.kou.picnicapp.utils.KalmanFilter;
 import com.kou.picnicapp.utils.LogWrapper;
-import com.kou.picnicapp.utils.PreferenceUtils;
 
 public class ScanGuardFragment extends Fragment implements OnClickListener {
 	private static final String TAG = ScanGuardFragment.class.getSimpleName();
@@ -134,63 +142,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 		}
 
 		setTargetData();
-		// performStopScan();
 	}
-
-	private void performStartScan() {
-		// checkCount = 0;
-		// scanCount = SCAN_COUNT_MAX + 1;
-		// handler.post(countDownScanRunnable);
-		// clearCheckState();
-		// scanLeDevice(true);
-	}
-
-	private void performStopScan() {
-		scanLeDevice(false);
-	}
-
-	private void scanLeDevice(final boolean enable) {
-		// if (enable) {
-		// handler.postDelayed(new Runnable() {
-		// @Override
-		// public void run() {
-		// isScanning = false;
-		// bluetoothAdapter.stopLeScan(mLeScanCallback);
-		// }
-		// }, SCAN_PERIOD);
-		//
-		// isScanning = true;
-		// bluetoothAdapter.startLeScan(mLeScanCallback);
-		// } else {
-		// isScanning = false;
-		// bluetoothAdapter.stopLeScan(mLeScanCallback);
-		// }
-	}
-
-	private Runnable countDownScanRunnable = new Runnable() {
-
-		@Override
-		public void run() {
-			scanCount--;
-
-			if (scanCount <= 0) {
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						btnScan.setText(getString(R.string.scan_text));
-					}
-				});
-			} else {
-				handler.postDelayed(countDownScanRunnable, 1000);
-				getActivity().runOnUiThread(new Runnable() {
-					@Override
-					public void run() {
-						btnScan.setText(getString(R.string.scan_text) + " " + scanCount);
-					}
-				});
-			}
-		}
-	};
 
 	private void clearCheckState() {
 		tvScanCount.setText("0 / " + listAdapter.getCount());
@@ -326,7 +278,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 
 			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
 				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_unknown);
-				viewHolder.ivFound.setImageResource(R.drawable.check_state_unknown);
+				viewHolder.ivFound.setImageResource(R.drawable.check_state_not_found);
 				viewHolder.rlRange.setVisibility(View.GONE);
 			} else {
 				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_found);
@@ -412,29 +364,81 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 		}
 	};
 
-	private void setTargetData() {
-		String strData = PreferenceUtils.getGuardList(getActivity());
+	public void setTargetData() {
+		String strData = readFileGuardData();
 
 		if (strData == null || strData.length() == 0) {
 			tvNodata.setVisibility(View.VISIBLE);
 			lvDevice.setVisibility(View.GONE);
 			tvScanCount.setText("0 / 0");
 		} else {
+			tvNodata.setVisibility(View.GONE);
+			lvDevice.setVisibility(View.VISIBLE);
 			Gson gson = new Gson();
 			java.lang.reflect.Type listType = new TypeToken<List<TargetData>>() {
 			}.getType();
+
+			strData = strData.replace("\\", "");
+			strData = strData.replace("\"[", "[");
+			strData = strData.replace("]\"", "]");
+
 			ArrayList<TargetData> targetDataList = gson.fromJson(strData, listType);
 			listAdapter.setTargetData(targetDataList);
-			tvScanCount.setText("0 / " + listAdapter.getCount());
 
+			int foundCount = 0;
+			for (TargetData t : targetDataList) {
+				if (t.getCheckState() == TargetData.CHECK_STATE.FOUND) {
+					foundCount++;
+				}
+			}
+
+			tvScanCount.setText(foundCount + " / " + listAdapter.getCount());
 		}
+
+		getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				listAdapter.notifyDataSetChanged();
+			}
+		});
+	}
+
+	private String readFileGuardData() {
+		String localPath = Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name);
+		BufferedReader br = null;
+		String readData = "";
+		try {
+			br = new BufferedReader(new FileReader(localPath + "/" + GuardService.FILENAME_GUARD_LIST));
+			StringBuilder sb = new StringBuilder();
+			String line = br.readLine();
+
+			while (line != null) {
+				sb.append(line);
+				line = br.readLine();
+			}
+			readData = sb.toString();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null) {
+					br.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		return readData;
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.btnScan:
-			performStartScan();
 			break;
 
 		case R.id.btnSort:

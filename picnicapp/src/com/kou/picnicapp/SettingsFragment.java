@@ -1,6 +1,8 @@
 package com.kou.picnicapp;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.kou.picnicapp.excel.ReadExcel;
 import com.kou.picnicapp.model.TargetData;
 import com.kou.picnicapp.utils.LogWrapper;
@@ -200,15 +203,7 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 
 			ArrayList<TargetData> targetDataList = null;
 
-			try {
-				targetDataList = ReadExcel.read(mPath + "/" + mChosenFile);
-			} catch (WriteException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (NumberFormatException e) {
-				e.printStackTrace();
-			}
+			targetDataList = ReadExcel.read(mPath + "/" + mChosenFile);
 
 			if (targetDataList == null || targetDataList.size() == 0) {
 				Toast.makeText(getActivity(), getString(R.string.check_list_failed), Toast.LENGTH_SHORT).show();
@@ -228,24 +223,52 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 
 			ArrayList<TargetData> targetDataList = null;
 
-			try {
-				targetDataList = ReadExcel.read(mPath + "/" + mChosenFile);
-			} catch (WriteException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			targetDataList = ReadExcel.read(mPath + "/" + mChosenFile);
 
-			if (targetDataList.size() == 0) {
+			if (targetDataList == null || targetDataList.size() == 0) {
 				Toast.makeText(getActivity(), getString(R.string.guard_list_failed), Toast.LENGTH_SHORT).show();
 			} else {
 				Gson gson = new Gson();
 				String targetDataStr = gson.toJson(targetDataList);
-				PreferenceUtils.setGuardList(getActivity(), targetDataStr);
+
+				java.lang.reflect.Type listType = new TypeToken<List<TargetData>>() {
+				}.getType();
+
+				targetDataList = gson.fromJson(targetDataStr, listType);
+
+				writeFileIsGuardStart(true);
+				writeFileGuardData(targetDataStr);
+				// PreferenceUtils.setGuardList(getActivity(), targetDataStr);
+				// PreferenceUtils.setIsGuardStart(getActivity(), true);
 				Toast.makeText(getActivity(), getString(R.string.guard_list_saved), Toast.LENGTH_SHORT).show();
 			}
 
 		}
+
 	};
+
+	private void writeFileIsGuardStart(boolean state) {
+		Gson gson = new Gson();
+		String strToSave = gson.toJson(state);
+		writeToFile(strToSave, GuardService.FILENAME_IS_GUARD_START);
+	}
+
+	private void writeFileGuardData(String targetDataStr) {
+		Gson gson = new Gson();
+		String strToSave = gson.toJson(targetDataStr);
+		writeToFile(strToSave, GuardService.FILENAME_GUARD_LIST);
+	}
+
+	private void writeToFile(String stringData, String filename) {
+		String localPath = Environment.getExternalStorageDirectory() + "/" + getString(R.string.app_name);
+		try {
+			BufferedWriter bos = new BufferedWriter(new FileWriter(localPath + "/" + filename));
+			bos.write(stringData);
+			bos.flush();
+			bos.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 
 }

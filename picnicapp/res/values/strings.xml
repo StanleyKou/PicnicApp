@@ -44,6 +44,10 @@
     <string name="send_call">Make a phone call</string>
     <string name="sort_notfound_first">Notfound first</string>
 
+    <!-- Guard -->
+    <string name="guard_warning">Picnicapp: Guard warning!</string>
+    <string name="guard_warning_toast">Picnicapp: Guard warning! TARGET LOST!</string>
+
     <!-- Contacts -->
     <string name="contacts_creadits">Credits</string>
     <string name="contacts_1">Yongwun Ko influenz@daum.net 010-5515-5014</string>

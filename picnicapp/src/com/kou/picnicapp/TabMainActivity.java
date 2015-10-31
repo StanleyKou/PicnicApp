@@ -1,24 +1,11 @@
-/*
- * Copyright (C) 2013 Andreas Stuetz <andreas.stuetz@gmail.com>
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.kou.picnicapp;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -99,24 +86,28 @@ public class TabMainActivity extends FragmentActivity {
 			}
 
 			@Override
-			public void onPageScrollStateChanged(int arg0) {
+			public void onPageScrollStateChanged(int position) {
+				switch (position) {
+
+				case 0:
+					scanCheckFragment.setTargetData();
+
+				case 1:
+					scanGuardFragment.setTargetData();
+
+				}
 
 			}
 		});
 
-		// Use this check to determine whether BLE is supported on the device. Then you can
-		// selectively disable BLE-related features.
 		if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
 			Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_SHORT).show();
 			finish();
 		}
 
-		// Initializes a Bluetooth adapter. For API level 18 and above, get a reference to
-		// BluetoothAdapter through BluetoothManager.
 		final BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
 		bluetoothAdapter = bluetoothManager.getAdapter();
 
-		// Checks if Bluetooth is supported on the device.
 		if (bluetoothAdapter == null) {
 			Toast.makeText(this, R.string.error_bluetooth_not_supported, Toast.LENGTH_SHORT).show();
 			finish();
@@ -138,11 +129,38 @@ public class TabMainActivity extends FragmentActivity {
 		case R.id.action_contact:
 			QuickContactFragment dialog = new QuickContactFragment();
 			dialog.show(getSupportFragmentManager(), "QuickContactFragment");
+
 			return true;
 
 		}
 
 		return super.onOptionsItemSelected(item);
+	}
+
+	IntentFilter intentFilter = new IntentFilter(GuardService.INTENT_GUARD_SERVICE_CHECK_COMPLETE);
+	private BroadcastReceiver guardServiceReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			scanGuardFragment.setTargetData();
+		}
+	};
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		Intent serviceIntent = new Intent(GuardService.INTENT_GUARD_SERVICE_START);
+		sendBroadcast(serviceIntent);
+
+		Intent intent = getIntent();
+		int position = intent.getIntExtra(GuardService.GUARD_SERVICE_WARNING, 0);
+
+		pager.setCurrentItem(position);
+
+		registerReceiver(guardServiceReceiver, intentFilter);
+
 	}
 
 	private void changeColor(int newColor) {
@@ -223,6 +241,10 @@ public class TabMainActivity extends FragmentActivity {
 		}
 	};
 
+	private ScanCheckFragment scanCheckFragment = ScanCheckFragment.newInstance(0);
+	private ScanGuardFragment scanGuardFragment = ScanGuardFragment.newInstance(1);
+	private SettingsFragment settingsFragment = SettingsFragment.newInstance(2);
+
 	public class MyPagerAdapter extends FragmentPagerAdapter {
 
 		private final String[] TITLES = { "인원체크", "지킴이", "설정" };
@@ -248,13 +270,16 @@ public class TabMainActivity extends FragmentActivity {
 			switch (position) {
 
 			case 0:
-				return ScanCheckFragment.newInstance(position);
+				return scanCheckFragment;
+
 			case 1:
-				return ScanGuardFragment.newInstance(position);
+				return scanGuardFragment;
+
 			case 2:
-				return SettingsFragment.newInstance(position);
+				return settingsFragment;
+
 			default:
-				return ScanCheckFragment.newInstance(position);
+				return scanCheckFragment;
 			}
 
 		}
