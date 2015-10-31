@@ -14,7 +14,7 @@
     <color name="btn_background_color_normal">#818590</color>
     <color name="btn_background_color_click">#FF7F7F</color>
     <color name="btn_text_color">#FFFFFF</color>
-    <color name="scan_summary_text">#020202</color>
+    <color name="scan_summary_text">#666666</color>
     <color name="scan_summary_background">#201534</color>
     <color name="listitem_clicked">#4045C9</color>
     <color name="list_no_item_text">#F0F0F0</color>
@@ -26,11 +26,12 @@
 
     <!-- Scan -->
     <color name="no_item_background">#707070</color>
-    <color name="scan_background">#FAFFEF</color>
-    <color name="scan_text">#000000</color>
+    <color name="scan_background">#EFEFEF</color>
+    <color name="scan_text">#666666</color>
+    <color name="scan_range_text">#FF6666</color>
 
     <!-- Settings -->
-    <color name="setting_background">#FAFFEF</color>
+    <color name="setting_background">#EFEFEF</color>
     <color name="setting_btn_text">#010101</color>
 
 </resources>

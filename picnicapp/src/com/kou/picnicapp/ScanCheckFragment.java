@@ -31,7 +31,6 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,6 +42,7 @@ import com.kou.picnicapp.model.TargetData.CHECK_STATE;
 import com.kou.picnicapp.utils.KalmanFilter;
 import com.kou.picnicapp.utils.LogWrapper;
 import com.kou.picnicapp.utils.PreferenceUtils;
+import com.kou.picnicapp.utils.Utils;
 
 public class ScanCheckFragment extends Fragment implements OnClickListener {
 	private static final String TAG = ScanCheckFragment.class.getSimpleName();
@@ -256,10 +256,15 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 							&& t.getMinor() == beacon.getMinor()) {
 
 						t.setCheckState(CHECK_STATE.FOUND);
+						t.setRssi(beacon.getRssi() + "");
 						checkCount++;
 						tvScanCount.setText(checkCount + " / " + listAdapter.getCount());
 					}
 				}
+			}
+
+			if (checkCount == targetDatalist.size()) {
+				performStopScan();
 			}
 
 			if (isSortUse) {
@@ -311,14 +316,10 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 			if (view == null) {
 				view = inflator.inflate(R.layout.listitem_target, null);
 				viewHolder = new ViewHolder();
-
-				viewHolder.rlListItem = (RelativeLayout) view.findViewById(R.id.rlListItem);
-				viewHolder.rlRange = (RelativeLayout) view.findViewById(R.id.rlRange);
+				viewHolder.tvRange = (TextView) view.findViewById(R.id.tvRange);
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
-				viewHolder.tvMajor = (TextView) view.findViewById(R.id.tvMajor);
-				viewHolder.tvMinor = (TextView) view.findViewById(R.id.tvMinor);
 				viewHolder.ivFound = (ImageView) view.findViewById(R.id.ivFound);
 				view.setTag(viewHolder);
 			} else {
@@ -327,21 +328,27 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 
 			TargetData target = targetDatalist.get(i);
 
+			double rssi = 0;
+			if (target.getRssi() != null) {
+				rssi = Double.parseDouble(target.getRssi());
+			}
+
+			double range = Utils.calculateAccuracy(rssi);
+			viewHolder.tvRange.setText(Math.round(range) + "m");
+
 			viewHolder.tvTargetNumber.setText(target.getNumber() + "");
 			viewHolder.tvTargetName.setText(target.getName());
 			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
 
-			viewHolder.tvMajor.setText("Major: " + target.getMajor());
-			viewHolder.tvMinor.setText("Minor: " + target.getMinor());
+			// viewHolder.tvMajor.setText("Major: " + target.getMajor());
+			// viewHolder.tvMinor.setText("Minor: " + target.getMinor());
 
 			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
-				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_unknown);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_unknown);
-				viewHolder.rlRange.setVisibility(View.GONE);
+				viewHolder.tvRange.setVisibility(View.GONE);
 			} else {
-				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_found);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_found);
-				viewHolder.rlRange.setVisibility(View.VISIBLE);
+				viewHolder.tvRange.setVisibility(View.VISIBLE);
 			}
 			return view;
 		}
@@ -380,15 +387,10 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	};
 
 	static class ViewHolder {
-		RelativeLayout rlListItem;
-		RelativeLayout rlRange;
-
+		TextView tvRange;
 		TextView tvTargetNumber;
 		TextView tvTargetName;
 		TextView tvTargetPhone;
-		TextView tvUUID;
-		TextView tvMajor;
-		TextView tvMinor;
 
 		ImageView ivFound;
 	}
@@ -423,6 +425,10 @@ public class ScanCheckFragment extends Fragment implements OnClickListener {
 	};
 
 	public void setTargetData() {
+		if (!isAdded()) {
+			return;
+		}
+
 		String strData = PreferenceUtils.getCheckList(getActivity());
 
 		if (strData == null || strData.length() == 0) {

@@ -36,7 +36,7 @@ import com.kou.picnicapp.utils.Utils;
 
 public class GuardService extends Service {
 
-	// 2분에 한 번 스캔시작, 1분간 스캔 후 판정. --> 18:00 20초에 한 번, 10초간 스캔 후 판정.
+	// 20초에 한 번, 10초간 스캔 후 판정.
 	// 발견되지 않으면 알람과 소리.
 	// -95 이하면 발견 안된걸로 간주.
 	// 스캔 결과를 수시로 저장
@@ -244,28 +244,31 @@ public class GuardService extends Service {
 
 	private void checkAndAlarm() {
 
-		long currentTime = System.currentTimeMillis();
-		boolean isNotFound = false;
+		int foundCount = 0;
+		// for (HashMap.Entry<String, Long> entry : timeList.entrySet()) {
+		// String key = entry.getKey();
+		// long value = entry.getValue();
+		// }
 
-		for (HashMap.Entry<String, Long> entry : timeList.entrySet()) {
-			String key = entry.getKey();
-			long value = entry.getValue();
+		for (TargetData t : targetDataList) {
+			t.setCheckState(TargetData.CHECK_STATE.UNKNOWN);
+		}
 
+		for (String key : timeList.keySet()) {
 			for (TargetData t : targetDataList) {
-				t.setCheckState(TargetData.CHECK_STATE.UNKNOWN);
-
 				String listkey = t.getUuid() + t.getMajor() + t.getMinor();
 
 				if (!key.equals(listkey)) {
 					continue;
 				}
 
-				isNotFound = true;
-				t.setLastCheckedTime(value);
+				foundCount++;
+				t.setLastCheckedTime(timeList.get(key));
 				t.setCheckState(TargetData.CHECK_STATE.FOUND);
-
 			}
 		}
+
+		timeList.clear();
 
 		Gson gson = new Gson();
 		String targetDataStr = gson.toJson(targetDataList);
@@ -274,7 +277,7 @@ public class GuardService extends Service {
 		Intent intent = new Intent(INTENT_GUARD_SERVICE_CHECK_COMPLETE);
 		sendBroadcast(intent);
 
-		if (isNotFound) {
+		if (foundCount != targetDataList.size()) {
 			Toast.makeText(this, getString(R.string.guard_warning), Toast.LENGTH_SHORT).show();
 
 			Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
@@ -307,8 +310,9 @@ public class GuardService extends Service {
 
 	public void notification() {
 		NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		Intent intent = new Intent(this, TabMainActivity.class);
+		Intent intent = new Intent(this, SplashActivity.class);
 		intent.putExtra(GUARD_SERVICE_WARNING, 1);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 1, intent, Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
 		Notification.Builder mBuilder = new Notification.Builder(this);

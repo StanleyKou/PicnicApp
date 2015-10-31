@@ -38,6 +38,8 @@ public class SplashActivity extends BaseActivity {
 	private static final String FTYPE = ".xls";
 	private String[] mFileList;
 
+	private int position;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		LogWrapper.d(TAG, TAG, "onCreate()");
@@ -136,6 +138,7 @@ public class SplashActivity extends BaseActivity {
 				public void onAnimationEnd(Animator animation) {
 					rlSplash.setVisibility(View.GONE);
 					Intent i = new Intent(SplashActivity.this, TabMainActivity.class);
+					i.putExtra(GuardService.GUARD_SERVICE_WARNING, position);
 					startActivity(i);
 					finish();
 				}
@@ -162,6 +165,8 @@ public class SplashActivity extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		position = getIntent().getIntExtra(GuardService.GUARD_SERVICE_WARNING, 0);
 
 	}
 

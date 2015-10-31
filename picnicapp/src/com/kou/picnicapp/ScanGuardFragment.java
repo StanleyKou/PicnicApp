@@ -254,18 +254,17 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 				view = inflator.inflate(R.layout.listitem_target, null);
 				viewHolder = new ViewHolder();
 
-				viewHolder.rlListItem = (RelativeLayout) view.findViewById(R.id.rlListItem);
 				viewHolder.rlRange = (RelativeLayout) view.findViewById(R.id.rlRange);
 				viewHolder.tvTargetNumber = (TextView) view.findViewById(R.id.tvTargetNumber);
 				viewHolder.tvTargetName = (TextView) view.findViewById(R.id.tvTargetName);
 				viewHolder.tvTargetPhone = (TextView) view.findViewById(R.id.tvTargetPhone);
-				viewHolder.tvMajor = (TextView) view.findViewById(R.id.tvMajor);
-				viewHolder.tvMinor = (TextView) view.findViewById(R.id.tvMinor);
 				viewHolder.ivFound = (ImageView) view.findViewById(R.id.ivFound);
 				view.setTag(viewHolder);
 			} else {
 				viewHolder = (ViewHolder) view.getTag();
 			}
+
+			viewHolder.rlRange.setVisibility(View.GONE);
 
 			TargetData target = targetDatalist.get(i);
 
@@ -273,17 +272,13 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			viewHolder.tvTargetName.setText(target.getName());
 			viewHolder.tvTargetPhone.setText(target.getPhoneNumber());
 
-			viewHolder.tvMajor.setText("Major: " + target.getMajor());
-			viewHolder.tvMinor.setText("Minor: " + target.getMinor());
+			// viewHolder.tvMajor.setText("Major: " + target.getMajor());
+			// viewHolder.tvMinor.setText("Minor: " + target.getMinor());
 
 			if (target.getCheckState() == CHECK_STATE.UNKNOWN) {
-				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_unknown);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_not_found);
-				viewHolder.rlRange.setVisibility(View.GONE);
 			} else {
-				viewHolder.rlListItem.setBackgroundResource(R.drawable.listitem_found);
 				viewHolder.ivFound.setImageResource(R.drawable.check_state_found);
-				viewHolder.rlRange.setVisibility(View.VISIBLE);
 			}
 			return view;
 		}
@@ -322,15 +317,11 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 	};
 
 	static class ViewHolder {
-		RelativeLayout rlListItem;
 		RelativeLayout rlRange;
 
 		TextView tvTargetNumber;
 		TextView tvTargetName;
 		TextView tvTargetPhone;
-		TextView tvUUID;
-		TextView tvMajor;
-		TextView tvMinor;
 
 		ImageView ivFound;
 	}
@@ -365,6 +356,10 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 	};
 
 	public void setTargetData() {
+		if (!isAdded()) {
+			return;
+		}
+
 		String strData = readFileGuardData();
 
 		if (strData == null || strData.length() == 0) {
