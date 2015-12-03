@@ -33,7 +33,9 @@
     <string name="choose_file">Choose your list file</string>
     <string name="choose_file_nofile">No list file. Put your list file into folder:</string>
     <string name="check_list_saved">Check list selected</string>
+    <string name="check_list_cleared">Check list cleared</string>
     <string name="guard_list_saved">Guard list selected</string>
+    <string name="guard_list_cleared">Guard list cleared</string>
     <string name="check_list_failed">File error: incorrect data</string>
     <string name="guard_list_failed">File error: incorrect data</string>
 

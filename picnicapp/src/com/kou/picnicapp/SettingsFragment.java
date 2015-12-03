@@ -37,7 +37,9 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 	private View mainView;
 
 	private Button btnLoadCheckList;
+	private Button btnClearCheckList;
 	private Button btnLoadGuardList;
+	private Button btnClearGuardList;
 
 	private String[] mFileList;
 	private File mPath = null;
@@ -69,10 +71,14 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 		mainView = inflater.inflate(R.layout.fragment_setting, null);
 
 		btnLoadCheckList = (Button) mainView.findViewById(R.id.btnLoadCheckList);
+		btnClearCheckList = (Button) mainView.findViewById(R.id.btnClearCheckList);
 		btnLoadGuardList = (Button) mainView.findViewById(R.id.btnLoadGuardList);
+		btnClearGuardList = (Button) mainView.findViewById(R.id.btnClearGuardList);
 
 		btnLoadCheckList.setOnClickListener(this);
+		btnClearCheckList.setOnClickListener(this);
 		btnLoadGuardList.setOnClickListener(this);
+		btnClearGuardList.setOnClickListener(this);
 
 		return mainView;
 	}
@@ -92,11 +98,20 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 			d.show();
 		}
 			break;
+
+		case R.id.btnClearCheckList:
+			clearCheckList();
+			break;
+
 		case R.id.btnLoadGuardList: {
 			loadFileList();
 			Dialog d = createDialog(DIALOG_LOAD_GUARD_FILE);
 			d.show();
 		}
+			break;
+
+		case R.id.btnClearGuardList:
+			clearGuardList();
 			break;
 
 		}
@@ -122,6 +137,17 @@ public class SettingsFragment extends Fragment implements OnClickListener {
 		} else {
 			mFileList = new String[0];
 		}
+	}
+
+	private void clearCheckList() {
+		PreferenceUtils.setCheckList(getActivity(), "");
+		Toast.makeText(getActivity(), getString(R.string.check_list_cleared), Toast.LENGTH_SHORT).show();
+	}
+
+	private void clearGuardList() {
+		writeFileIsGuardStart(false);
+		writeFileGuardData("");
+		Toast.makeText(getActivity(), getString(R.string.guard_list_cleared), Toast.LENGTH_SHORT).show();
 	}
 
 	protected Dialog createDialog(int id) {

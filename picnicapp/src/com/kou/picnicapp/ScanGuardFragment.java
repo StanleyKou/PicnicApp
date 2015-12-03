@@ -362,7 +362,7 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 
 		String strData = readFileGuardData();
 
-		if (strData == null || strData.length() == 0) {
+		if (strData == null || strData.length() == 0 || strData.equals("\"\"")) {
 			tvNodata.setVisibility(View.VISIBLE);
 			lvDevice.setVisibility(View.GONE);
 			tvScanCount.setText("0 / 0");
@@ -377,7 +377,12 @@ public class ScanGuardFragment extends Fragment implements OnClickListener {
 			strData = strData.replace("\"[", "[");
 			strData = strData.replace("]\"", "]");
 
-			ArrayList<TargetData> targetDataList = gson.fromJson(strData, listType);
+			ArrayList<TargetData> targetDataList;
+			if (strData.length() == 0) {
+				targetDataList = new ArrayList<TargetData>();
+			} else {
+				targetDataList = gson.fromJson(strData, listType);
+			}
 			listAdapter.setTargetData(targetDataList);
 
 			int foundCount = 0;
