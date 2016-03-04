@@ -9,11 +9,13 @@ PicnicApp
 
 2015 함께 서울 앱 공모전, 노력상(15위) 수상 성공! [링크][1]
 
-![](website/image/splash.png)
-![](website/image/list1.png)
-![](website/image/list2.png)
 
 
+
+<img src="website/image/splash.png" width="360" height="640" />
+
+<img src="website/image/list1.png" width="360" height="640" />
+<img src="website/image/list2.png" width="360" height="640" />
 
 
  [1]: https://mplatform.seoul.go.kr/w/wnpzcontestapp/selectPageListWnpzContestApp.do
